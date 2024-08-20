@@ -59,10 +59,10 @@ This notebook is designed to process, analyze, and fine-tune models based on use
 ## 7. SC Features (Specificity Score, Coherency Score)
 - Definition and calculation of Specificity and Coherency scores.
 - Visualization of Specificity and Coherency scores through histograms and hexbin plots.
-- Relative score calculation.
+- Relative scores analysis.
 
 ## 8. Token Length Features (Brevity Score)
-- Tokenization examples and exploration of disparities in token counts.
+- Tokenization examples and exploration of the dataset.
 - Calculation of Brevity scores and their visualization through histograms and hexbin plots.
 - Compilation of SCBN (Specificity, Coherency, Brevity, Novelty) scores.
 
@@ -73,10 +73,10 @@ This notebook is designed to process, analyze, and fine-tune models based on use
 - First approximation and feature calibration using a linear decision tree model.
 
 ## 11. Logistic Regression
-- Implementation of a logistic regression model for classification tasks.
+- Implementation of a simplified logistic regression model for predicting response votes, using only SCBN-RQTL-related metrics.
 
 ## 12. Neural Network
-- Implementation of a neural network model for further classification and analysis.
+- Implementation of a neural network model for predicting response votes, using only SCBN-RQTL-related metrics.
 
 ## 13. Kaggle Submission
 - Preparation and submission of the final model and results to Kaggle.
