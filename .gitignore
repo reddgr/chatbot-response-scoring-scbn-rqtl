@@ -6,6 +6,22 @@ __pycache__/
 # C extensions
 *.so
 
+# models
+*.model
+*.vocab
+*.h5
+*.safetensors
+
+# Data
+*.csv
+*.xlsx
+*.xls
+*.json
+*.txt
+*.pkl
+*.pickle
+*.zip
+
 # Distribution / packaging
 .Python
 build/
