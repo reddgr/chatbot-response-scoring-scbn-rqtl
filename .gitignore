@@ -11,6 +11,10 @@ __pycache__/
 *.vocab
 *.h5
 *.safetensors
+*.pt
+*.pth
+*.bin
+*tfevents*
 
 # Data
 *.csv
