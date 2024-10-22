@@ -1,9 +1,31 @@
 # chatbot-response-scoring-scbn-rqtl
 
-This repository contains a Jupyter notebook that builds a dataset scoring chatbot responses from LMSYS Chatbot Arena using SCBN (Specificity, Coherency, Brevity, Novelty) and RQTL (Request vs Question, Test vs Learn) metrics, a benchmark I created to evaluate chatbot responses
+This repository contains several Jupyter notebooks that classify chatbot prompts and predict human preference on responses using SCBN (Specificity, Coherency, Brevity, Novelty) and RQTL (Request vs Question, Test vs Learn) metrics, a benchmark I created to evaluate chatbot responses based on prompts.
 
 - **SCBN**: A framework that scores chatbot responses by measuring Specificity, Coherency, Brevity, and Novelty.
-- **RQTL**: A classification system for categorizing user prompts into four types: Request vs Question, Test vs Learn.
+- **RQTL**: A classification system for categorizing user prompts into four quadrants: Request vs Question, Test vs Learn.
+
+The notebooks in this repository are based on the [Talking to Chatbots](https://talkingtochatbots.com/) blog posts and the [LMSYS – Chatbot Arena Human Preference Predictions](https://www.kaggle.com/competitions/lmsys-chatbot-arena) competition on Kaggle.
+
+## Files
+
+- `lmsys-cba-reddgr-scbn-rqtl-codespaces.ipynb`: A Jupyter notebook that classifies chatbot prompts and predicts human preference on responses using SCBN and RQTL metrics. The notebook covers data preprocessing, classification, and model training and evaluation.
+- `lmsys-cba-reddgr-scbn-rqtl-kaggle.ipynb`: older version of the notebook that can be run directly on Kaggle
+- `zero-shot-and-few-shot-text-classification-examples.ipynb`: text classification process and examples used in the main notebook, using Tensorflow as main framework.
+- `zero-shot-and-few-shot-text-classification-examples-torch.ipynb`: text classification process and examples used in the main notebook, using PyTorch as main framework.
+- `chat-with-gemma-notebook.ipynb`: A Jupyter notebook that sets up a chat interface with the Gemma model, enabling interaction by sending prompts and receiving responses directly within the notebook. It simplifies testing and experimentation with the model, eliminating the need for external applications or interfaces. Gemma was not used in the original SCBN-RQTL scoring notebook, but this asset is included here as the code may be useful for performing further analysis and improvements to the SCBN-RQTL benchmark.
+- `datasets.ipynb`: This notebook downloads prompts and responses from the official LMSYS Chatbot Arena repository hosted on HuggingFace. It requires a HuggingFace token to access the lmsys-chat-1m dataset, retrieves and caches the data locally, and provides tools for exploring specific conversations and displaying samples directly within the notebook.
+- `install_dependencies.sh`: A shell script that installs the necessary dependencies to run the Jupyter notebook.
+- `requirements.txt`: A file containing the Python dependencies for the Jupyter notebooks.
+
+## Usage
+
+To run the notebook, follow these steps:
+
+1. Clone the repository:
+
+```bash
+git clone
 
 - **Context**: This work is part of the [LMSYS – Chatbot Arena Human Preference Predictions](https://www.kaggle.com/competitions/lmsys-chatbot-arena) competition on Kaggle.
 - **Notebook**: Original notebook published on [Kaggle](https://www.kaggle.com/code/davidgromero/lmsys-cba-reddgr-scbn-rqtl-v1).
@@ -12,12 +34,20 @@ This repository contains a Jupyter notebook that builds a dataset scoring chatbo
   - [Introduction to SCBN Chatbot battles in TTCB blog](https://talkingtochatbots.com/talking-to-chatbots/is-philosophy-a-science-chatbot-battle/)
   - [SCBN search term in TTCB blog](https://talkingtochatbots.com/?s=SCBN)
  
+## Installation
+
+To install all necessary dependencies, make the script executable and run:
+
+```bash
+chmod +x install_dependencies.sh
+install_dependencies.sh
 
 # Notebook Overview
 
-This notebook is designed to process, analyze, and fine-tune models based on user prompt data from the Chatbot Arena as part of the LMSYS Chatbot Arena competition on Kaggle. The competition's goal is to predict which chatbot responses users will prefer in head-to-head battles between chatbots powered by large language models (LLMs). The notebook follows a series of steps to prepare data, fine-tune models, and make predictions to address the competition's objectives.
+The notebook lmsys-cba-reddgr-scbn-rqtl-kaggle.ipynb was originally designed to process, analyze, and fine-tune models based on user prompt data from the Chatbot Arena as part of the LMSYS Chatbot Arena competition on Kaggle. The competition's goal was to predict which chatbot responses users will prefer in head-to-head battles between chatbots powered by large language models (LLMs). The notebook follows a series of steps to prepare data, fine-tune models, and make predictions to address the competition's objectives.
 
 ## 0. Input Data and Libraries Import
+
 - Set up of the Kaggle Notebook environment.
 - Importing necessary libraries.
 - Initial setup of the notebook environment.
