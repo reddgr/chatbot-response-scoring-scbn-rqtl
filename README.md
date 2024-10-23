@@ -18,15 +18,6 @@ The notebooks in this repository are based on the [Talking to Chatbots](https://
 - `install_dependencies.sh`: A shell script that installs the necessary dependencies to run the Jupyter notebook.
 - `requirements.txt`: A file containing the Python dependencies for the Jupyter notebooks.
 
-## Usage
-
-To run the notebook, follow these steps:
-
-1. Clone the repository:
-
-```bash
-git clone
-
 - **Context**: This work is part of the [LMSYS – Chatbot Arena Human Preference Predictions](https://www.kaggle.com/competitions/lmsys-chatbot-arena) competition on Kaggle.
 - **Notebook**: Original notebook published on [Kaggle](https://www.kaggle.com/code/davidgromero/lmsys-cba-reddgr-scbn-rqtl-v1).
 - **Further Reading**:
