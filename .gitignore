@@ -9,6 +9,7 @@ __pycache__/
 # models
 *.model
 *.vocab
+*vocab.txt*
 *.h5
 *.safetensors
 *.pt
@@ -21,7 +22,7 @@ __pycache__/
 *.xlsx
 *.xls
 *.json
-*.txt
+# *.txt
 *.pkl
 *.pickle
 *.zip

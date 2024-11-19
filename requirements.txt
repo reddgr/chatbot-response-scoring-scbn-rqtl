@@ -1,0 +1,15 @@
+datasets
+ipython
+ipywidgets
+json
+kagglehub
+langdetect
+matplotlib
+numpy
+pandas
+scikit-learn
+tensorflow
+tf-keras
+textblob
+tqdm
+transformers
