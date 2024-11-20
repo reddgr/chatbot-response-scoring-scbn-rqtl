@@ -18,8 +18,9 @@ The core foundational ideas of this repository are inspired by the SCBN benchmar
 - `install_dependencies.sh`: A shell script that installs the necessary dependencies to run the Jupyter notebook.
 - `requirements.txt`: A file containing the Python dependencies for the Jupyter notebooks.
 
-- **Context**: This work is part of the [LMSYS – Chatbot Arena Human Preference Predictions](https://www.kaggle.com/competitions/lmsys-chatbot-arena) competition on Kaggle.
-- **Notebook**: Original notebook published on [Kaggle](https://www.kaggle.com/code/davidgromero/lmsys-cba-reddgr-scbn-rqtl-v1).
+- **Additional Context**:
+  - Original notebook published on [Kaggle](https://www.kaggle.com/code/davidgromero/lmsys-cba-reddgr-scbn-rqtl-v1).
+  - [Reddgr models and datasets on HuggingFace](https://huggingface.co/reddgr)
 - **Further Reading**:
   - [Introduction to the SCBN in TTCB blog](https://talkingtochatbots.com/predicting-chatbot-arena-votes-with-the-scbn-and-rqtl-benchmarks/)
   - [Introduction to SCBN Chatbot battles in TTCB blog](https://talkingtochatbots.com/talking-to-chatbots/is-philosophy-a-science-chatbot-battle/)
