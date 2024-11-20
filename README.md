@@ -5,7 +5,7 @@ This repository contains several Jupyter notebooks that classify chatbot prompts
 - **SCBN**: A framework that scores chatbot responses by measuring Specificity, Coherency, Brevity, and Novelty.
 - **RQTL**: A classification system for categorizing user prompts into four quadrants: Request vs Question, Test vs Learn.
 
-The notebooks in this repository are based on the [Talking to Chatbots](https://talkingtochatbots.com/) blog posts and the [LMSYS – Chatbot Arena Human Preference Predictions](https://www.kaggle.com/competitions/lmsys-chatbot-arena) competition on Kaggle.
+The core foundational ideas of this repository are inspired by the SCBN benchmark first introduced at the [Talking to Chatbots](https://talkingtochatbots.com/) website and a submission to the [LMSYS – Chatbot Arena Human Preference Predictions](https://www.kaggle.com/competitions/lmsys-chatbot-arena) competition on Kaggle.
 
 ## Files
 
