@@ -1,6 +1,6 @@
 # chatbot-response-scoring-scbn-rqtl
 
-This repository contains several Jupyter notebooks that classify chatbot prompts and predict human preference on responses using SCBN (Specificity, Coherency, Brevity, Novelty) and RQTL (Request vs Question, Test vs Learn) metrics, a benchmark I created to evaluate chatbot responses based on prompts.
+This repository contains several Jupyter notebooks and Python scripts that classify chatbot prompts and predict human preference on responses using SCBN (Specificity, Coherency, Brevity, Novelty) and RQTL (Request vs Question, Test vs Learn) metrics, a benchmark I created to evaluate chatbot responses based on prompts.
 
 - **SCBN**: A framework that scores chatbot responses by measuring Specificity, Coherency, Brevity, and Novelty.
 - **RQTL**: A classification system for categorizing user prompts into four quadrants: Request vs Question, Test vs Learn.
