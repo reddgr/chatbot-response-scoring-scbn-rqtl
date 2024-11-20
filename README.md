@@ -29,7 +29,6 @@ The notebooks in this repository are based on the [Talking to Chatbots](https://
 
 To install all necessary dependencies, make the script executable and run:
 
-```bash
 chmod +x install_dependencies.sh
 install_dependencies.sh
 
