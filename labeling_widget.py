@@ -2,6 +2,7 @@ import pandas as pd
 from IPython.display import display, clear_output
 from ipywidgets import Button, HBox, VBox, Output
 import textwrap
+from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
 
 class LabelingWidget:
     def __init__(self):
@@ -99,3 +100,25 @@ class LabelingWidget:
         # Display the interface
         display(VBox([HBox([correct_button, wrong_button, pass_button, end_button]), output]))
         display_text()
+
+    def update_dataset(self, dataset_name, split_name, hf_token, new_dataset_records=None):
+        """
+        Updates a HuggingFace dataset with the labeled data or a custom dataframe.
+
+        Parameters:
+        - dataset_name: The name of the dataset on the HuggingFace Hub.
+        - hf_token: The HuggingFace token for authentication.
+        - split_name: The split of the dataset to update ('train' or 'test').
+        """
+        if not new_dataset_records:
+            new_dataset_records = Dataset.from_pandas(self.labeled_data)
+        else:
+            new_dataset_records = new_dataset_records
+        dataset = load_dataset(dataset_name, token=hf_token)
+        updated_split = concatenate_datasets([dataset[split_name], new_dataset_records])
+        updated_dataset = DatasetDict({
+            'train': dataset['train'] if split_name == 'test' else updated_split,
+            'test': dataset['test'] if split_name == 'train' else updated_split
+        })
+        updated_dataset.push_to_hub(dataset_name, token=hf_token)
+        print(f"Successfully pushed {len(new_dataset_records)} records to {dataset_name} {split_name} split.")   
