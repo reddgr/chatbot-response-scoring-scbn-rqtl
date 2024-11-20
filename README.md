@@ -1,11 +1,11 @@
 # chatbot-response-scoring-scbn-rqtl
 
-This repository contains several Jupyter notebooks that classify chatbot prompts and predict human preference on responses using SCBN (Specificity, Coherency, Brevity, Novelty) and RQTL (Request vs Question, Test vs Learn) metrics, a benchmark I created to evaluate chatbot responses based on prompts.
+This repository contains several Jupyter notebooks and Python scripts that classify chatbot prompts and predict human preference on responses using SCBN (Specificity, Coherency, Brevity, Novelty) and RQTL (Request vs Question, Test vs Learn) metrics, a benchmark I created to evaluate chatbot responses based on prompts.
 
 - **SCBN**: A framework that scores chatbot responses by measuring Specificity, Coherency, Brevity, and Novelty.
 - **RQTL**: A classification system for categorizing user prompts into four quadrants: Request vs Question, Test vs Learn.
 
-The notebooks in this repository are based on the [Talking to Chatbots](https://talkingtochatbots.com/) blog posts and the [LMSYS – Chatbot Arena Human Preference Predictions](https://www.kaggle.com/competitions/lmsys-chatbot-arena) competition on Kaggle.
+The core foundational ideas of this repository are inspired by the SCBN benchmark first introduced at the [Talking to Chatbots](https://talkingtochatbots.com/) website and a submission to the [LMSYS – Chatbot Arena Human Preference Predictions](https://www.kaggle.com/competitions/lmsys-chatbot-arena) competition on Kaggle.
 
 ## Files
 
@@ -18,8 +18,9 @@ The notebooks in this repository are based on the [Talking to Chatbots](https://
 - `install_dependencies.sh`: A shell script that installs the necessary dependencies to run the Jupyter notebook.
 - `requirements.txt`: A file containing the Python dependencies for the Jupyter notebooks.
 
-- **Context**: This work is part of the [LMSYS – Chatbot Arena Human Preference Predictions](https://www.kaggle.com/competitions/lmsys-chatbot-arena) competition on Kaggle.
-- **Notebook**: Original notebook published on [Kaggle](https://www.kaggle.com/code/davidgromero/lmsys-cba-reddgr-scbn-rqtl-v1).
+- **Additional Context**:
+  - Original notebook published on [Kaggle](https://www.kaggle.com/code/davidgromero/lmsys-cba-reddgr-scbn-rqtl-v1).
+  - [Reddgr models and datasets on HuggingFace](https://huggingface.co/reddgr)
 - **Further Reading**:
   - [Introduction to the SCBN in TTCB blog](https://talkingtochatbots.com/predicting-chatbot-arena-votes-with-the-scbn-and-rqtl-benchmarks/)
   - [Introduction to SCBN Chatbot battles in TTCB blog](https://talkingtochatbots.com/talking-to-chatbots/is-philosophy-a-science-chatbot-battle/)
@@ -29,7 +30,6 @@ The notebooks in this repository are based on the [Talking to Chatbots](https://
 
 To install all necessary dependencies, make the script executable and run:
 
-```bash
 chmod +x install_dependencies.sh
 install_dependencies.sh
 
