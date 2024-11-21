@@ -1,20 +1,20 @@
-from transformers import pipeline
+from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
 from tqdm import tqdm
 import torch
 import numpy as np
+import os
 from langdetect import detect
 from sklearn.metrics import accuracy_score, f1_score, log_loss, confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 
 class Classifier:
-
     def __init__(self, model_path, label_map, verbose = False):
         self.model_path = model_path
         self.classifier = pipeline("text-classification", model=model_path, tokenizer=model_path, device=0 if torch.cuda.is_available() else -1)
         self.label_map = label_map
         if verbose: 
             self.print_device_information()
-
+    
     def print_device_information(self):
         # Check device information
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -134,3 +134,56 @@ class LanguageDetector:
 
         return self.dataframe
     
+
+# Classifier with Tensorflow backend
+class TensorflowClassifier(Classifier):
+    def __init__(self, model_path, label_map, verbose=False):
+        super().__init__(model_path, label_map, verbose=False)
+        self.is_tensorflow = False
+        
+        if self._is_tensorflow_model(model_path):
+            self.model = tf.keras.models.load_model(model_path)
+            self.tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")  # Adjust as per training tokenizer
+            self.is_tensorflow = True
+            if verbose:
+                print("Loaded TensorFlow model.")
+        else:
+            if verbose:
+                print("Fallback to HuggingFace pipeline.")
+
+    def _is_tensorflow_model(self, model_path):
+        return os.path.isdir(model_path) and os.path.exists(os.path.join(model_path, "saved_model.pb"))
+
+    def classify(self, text):
+        if self.is_tensorflow:
+            inputs = self.tokenizer(text, truncation=True, max_length=self.tokenizer.model_max_length, return_tensors="np")
+            logits = self.model.predict([inputs["input_ids"], inputs["attention_mask"]])
+            probabilities = tf.nn.softmax(logits).numpy()
+            label_id = np.argmax(probabilities, axis=-1).item()
+            return {
+                "label": f"LABEL_{label_id}",
+                "score": probabilities.max()
+            }
+        else:
+            return self.classifier(text)[0]
+
+    def classify_dataframe_column(self, df, target_column, feature_suffix):
+        tqdm.pandas()
+        df[f'trimmed_{target_column}'] = df[target_column].progress_apply(
+            lambda text: self.tokenizer.decode(
+                self.tokenizer(text, truncation=True, max_length=self.tokenizer.model_max_length)["input_ids"],
+                skip_special_tokens=True
+            )
+        )
+
+        if self.is_tensorflow:
+            results = [self.classify(text) for text in df[f'trimmed_{target_column}']]
+        else:
+            results = [self.classifier(text)[0] for text in df[f'trimmed_{target_column}']]
+
+        df[f'pred_label_{feature_suffix}'] = [
+            self.label_map[int(result['label'].split('_')[-1])] for result in results
+        ]
+        df[f'prob_{feature_suffix}'] = [result['score'] for result in results]
+        df.drop(columns=[f'trimmed_{target_column}'], inplace=True)
+        return df
