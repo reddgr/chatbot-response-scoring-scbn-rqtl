@@ -4,6 +4,7 @@ import torch
 import numpy as np
 from langdetect import detect
 from sklearn.metrics import accuracy_score, f1_score, log_loss, confusion_matrix, ConfusionMatrixDisplay
+import matplotlib.pyplot as plt
 
 class Classifier:
 
@@ -93,8 +94,10 @@ class Classifier:
 
         # Confusion matrix
         cm = confusion_matrix(true_labels, np.argmax(predicted_probs, axis=1))
+        cmap = plt.cm.Blues
         disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0, 1])
-        disp.plot()
+        disp.plot(cmap=cmap)
+        plt.show()
 
         # Cleanup
         df.drop(columns=[f'trimmed_{target_column}'], inplace=True)
