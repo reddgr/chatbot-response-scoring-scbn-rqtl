@@ -41,7 +41,7 @@ class LabelingWidget:
             output.clear_output(wait=True)
             with output:
                 print("### Labeling Session Ended ###")
-                print(f"Total labels recorded: {len(self.labeled_data)}")
+                print(f"Label map: {label_map}\nTotal labels recorded: {len(self.labeled_data)}")
                 print("Labeled data:")
                 display(self.labeled_data)
                 self.session_complete = True
