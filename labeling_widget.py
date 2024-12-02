@@ -96,9 +96,10 @@ class LabelingWidget:
         Updates a HuggingFace dataset with the labeled data or a custom dataframe.
 
         Parameters:
-        - dataset_name: The name of the dataset on the HuggingFace Hub.
-        - hf_token: The HuggingFace token for authentication.
-        - split_name: The split of the dataset to update ('train' or 'test').
+        - dataset_name (str): The name of the dataset on the HuggingFace Hub.
+        - split_name (str): The split of the dataset to update ('train' or 'test').
+        - hf_token (str): The HuggingFace token for authentication.
+        - new_dataset_records (Optional[pandas.DataFrame or Dataset], optional): A custom dataframe or dataset with new records to add. Defaults to None.
         """
         if not new_dataset_records:
             new_dataset_records = Dataset.from_pandas(self.labeled_data)
