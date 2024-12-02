@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import textwrap
+import random
 from datasets import load_dataset
 from IPython.display import display
 
@@ -29,13 +30,28 @@ class LMSYSChat1MHandler:
                 print(f"Filename: {filename[:i]}*{filename[-41:]}\nSize: {file_size} bytes")
 
     def extract_df_sample(self, n_samples):
-        df_sample = self.lmsys_dataset['train'].to_pandas().sample(n_samples)
-        print(f"Retrieved {len(df_sample)} records")
-        if self.verbose and n_samples>4:
-            display(df_sample.head(2))
-            print('...')
-            display(df_sample.tail(2))
-        self.df_sample = df_sample
+        if not self.streaming:    
+            df_sample = self.lmsys_dataset['train'].to_pandas().sample(n_samples)
+            print(f"Retrieved {len(df_sample)} conversations from lmsys/lmsys-chat-1m")
+            if self.verbose and n_samples>4:
+                display(df_sample.head(2))
+                print('...')
+                display(df_sample.tail(2))
+            self.df_sample = df_sample
+
+        if self.streaming:
+            # Take a sample from the streamed dataset
+            streamed_samples = []
+            for i, row in enumerate(self.lmsys_dataset['train']):
+                streamed_samples.append(row)
+                if i + 1 == n_samples:  # Collect only the desired number of samples
+                    break
+
+            # Shuffle and convert the collected samples to a Pandas DataFrame
+            random.shuffle(streamed_samples)
+            df_sample = pd.DataFrame(streamed_samples)
+            self.df_sample = df_sample
+
         return df_sample
 
     def extract_prompts(self, filter_language=None, max_char_length=500):
