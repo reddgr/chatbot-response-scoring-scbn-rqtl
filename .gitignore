@@ -18,6 +18,7 @@ __pycache__/
 *tfevents*
 
 # Data
+*.arrow
 *.csv
 *.xlsx
 *.xls

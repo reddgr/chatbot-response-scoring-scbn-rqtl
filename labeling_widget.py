@@ -2,14 +2,15 @@ import pandas as pd
 from IPython.display import display, clear_output
 from ipywidgets import Button, HBox, VBox, Output
 import textwrap
-from datasets import Dataset, DatasetDict, concatenate_datasets, load_dataset
+from datasets import Dataset, DatasetDict, ClassLabel, concatenate_datasets, load_dataset
 
 class LabelingWidget:
-    def __init__(self):
+    def __init__(self,label_map):
         self.labeled_data = pd.DataFrame(columns=["text", "label"])
         self.session_complete = False
+        self.label_map = label_map
     
-    def manual_labeling(self, df, classifier, label_map):
+    def manual_labeling(self, df, classifier):
         """
         Manual labeling function for user interaction. Returns labeled_data when the session ends.
         """
@@ -41,7 +42,7 @@ class LabelingWidget:
             output.clear_output(wait=True)
             with output:
                 print("### Labeling Session Ended ###")
-                print(f"Label map: {label_map}\nTotal labels recorded: {len(self.labeled_data)}")
+                print(f"Label map: {self.label_map}\nTotal labels recorded: {len(self.labeled_data)}")
                 print("Labeled data:")
                 display(self.labeled_data)
                 self.session_complete = True
@@ -71,7 +72,7 @@ class LabelingWidget:
                 predicted_label = int(result["label"].split("_")[-1])
                 prob = result["score"]
                 wrapped_text = textwrap.fill(text, width=120)
-                label_str = label_map[predicted_label]
+                label_str = self.label_map[predicted_label]
                 print(f"### Predicted: {label_str} ({prob:.3f}) ###")
                 print(wrapped_text)
 
@@ -91,6 +92,16 @@ class LabelingWidget:
         # Initialize by displaying the first text
         display_text()
 
+    def cast_label_to_classlabel(self, dataset):
+        class_label = ClassLabel(names=[self.label_map[i] for i in sorted(self.label_map.keys())])
+        # Map the 'label' feature to the new ClassLabel feature
+        def map_labels(example):
+            example['label'] = class_label.str2int(self.label_map[example['label']])
+            return example
+        dataset = dataset.map(map_labels)
+        dataset = dataset.cast_column("label", class_label)
+        return dataset
+
     def update_dataset(self, dataset_name, split_name, hf_token, new_dataset_records=None):
         """
         Updates a HuggingFace dataset with the labeled data or a custom dataframe.
@@ -106,6 +117,7 @@ class LabelingWidget:
         else:
             new_dataset_records = new_dataset_records
         dataset = load_dataset(dataset_name, token=hf_token)
+        new_dataset_records = self.cast_label_to_classlabel(new_dataset_records)
         updated_split = concatenate_datasets([dataset[split_name], new_dataset_records])
         updated_dataset = DatasetDict({
             'train': dataset['train'] if split_name == 'test' else updated_split,
