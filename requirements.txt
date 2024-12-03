@@ -1,7 +1,6 @@
 datasets
 ipython
 ipywidgets
-json
 kagglehub
 langdetect
 matplotlib
