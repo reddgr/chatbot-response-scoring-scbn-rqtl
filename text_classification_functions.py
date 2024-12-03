@@ -1,4 +1,5 @@
 from transformers import pipeline, AutoModelForSequenceClassification, AutoTokenizer
+from datasets import Dataset
 from tqdm import tqdm
 import torch
 import numpy as np
@@ -54,15 +55,67 @@ class Classifier:
         Args:
             df (pd.DataFrame): Input dataframe containing the data.
             target_column (str): The name of the column to classify.
-            feature_suffix (str): Suffix to append to the generated prediction columns.
 
         Requirements:
             - The dataframe must include a 'label' column for comparison with predictions.
 
         Returns:
             dict: A dictionary containing accuracy, F1 score, cross-entropy loss, 
-                  and the confusion matrix.
+                and the confusion matrix.
         """
+        # Convert pandas dataframe to Dataset
+        dataset = Dataset.from_pandas(df)
+
+        # Define a processing function for tokenization and classification
+        def process_data(batch):
+            trimmed_text = self.tokenize_and_trim(batch[target_column])
+            result = self.classifier(trimmed_text)
+            score = result[0]['score']
+            label = result[0]['label']
+            return {
+                'trimmed_text': trimmed_text,
+                'predicted_prob_0': score if label == 'LABEL_0' else 1 - score,
+                'predicted_prob_1': 1 - score if label == 'LABEL_0' else score,
+            }
+
+        # Apply processing with map
+        processed_dataset = dataset.map(process_data, batched=False)
+
+        # Convert back to pandas dataframe
+        processed_df = processed_dataset.to_pandas()
+
+        # Extract predicted probabilities and true labels
+        predicted_probs = processed_df[['predicted_prob_0', 'predicted_prob_1']].values
+        true_labels = df['label'].values
+
+        # Calculate metrics
+        accuracy = accuracy_score(true_labels, np.argmax(predicted_probs, axis=1))
+        f1 = f1_score(true_labels, np.argmax(predicted_probs, axis=1), average='weighted')
+        cross_entropy_loss = log_loss(true_labels, predicted_probs)
+
+        # Print metrics
+        print(f"Accuracy: {accuracy:.4f}")
+        print(f"F1 Score: {f1:.4f}")
+        print(f"Cross Entropy Loss: {cross_entropy_loss:.4f}")
+
+        # Confusion matrix
+        cm = confusion_matrix(true_labels, np.argmax(predicted_probs, axis=1))
+        cmap = plt.cm.Blues
+        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0, 1])
+        disp.plot(cmap=cmap)
+        plt.show()
+
+        # Return metrics and probabilities for further inspection
+        return {
+            "accuracy": accuracy,
+            "f1_score": f1,
+            "cross_entropy_loss": cross_entropy_loss,
+            "confusion_matrix": cm,
+            "predicted_probs": predicted_probs  # Include reconstructed probabilities
+        }
+    
+
+    def test_model_predictions_SEQ(self, df, target_column):
         tqdm.pandas()
         df[f'trimmed_{target_column}'] = df[target_column].progress_apply(self.tokenize_and_trim)
 
