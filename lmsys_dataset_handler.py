@@ -20,6 +20,7 @@ class LMSYSChat1MHandler:
             print(self.lmsys_dataset)
         self.df_sample = None
         self.df_prompts = None
+        self.unwrapped_turns_df = None
 
         if not self.streaming and verbose:
             print('Data is cached at:\n')
@@ -53,6 +54,51 @@ class LMSYSChat1MHandler:
             self.df_sample = df_sample
 
         return df_sample
+    
+    def add_turns_to_conversations(self):
+        """
+        Adds 'turn' keys to each conversation in the 'conversation' column of the dataframe.
+        """
+        self.df_sample['conversation'] = self.df_sample['conversation'].apply(
+            lambda conv: Conversation(conv).add_turns()
+        )
+        df_with_turns = self.df_sample
+        return df_with_turns
+    
+    def unwrap_turns(self):
+        """
+        Creates a dataframe where each row corresponds to a pair of user-assistant messages in a conversation and turn.
+        The 'prompt' column contains the user's message, and the 'response' column contains the assistant's message.
+        Each row includes a 'turn_id' column, which numbers the turns uniquely per conversation.
+        """
+        paired_data = []
+        for _, row in self.df_sample.iterrows():
+            conversation_id = row['conversation_id']
+            row_data = row.to_dict()
+            row_data.pop('conversation')  # Remove the 'conversation' field as it's being unwrapped
+
+            current_prompt = None
+            turn_id = None
+
+            for message in row['conversation']:
+                if message['role'] == 'user':
+                    current_prompt = message['content']
+                    turn_id = f"{conversation_id}{message['turn']:03}"  # Create turn_id
+                elif message['role'] == 'assistant' and current_prompt is not None:
+                    # Create a new row with the user-assistant pair
+                    paired_row = {
+                        **row_data,
+                        'turn_n': message['turn'],
+                        'prompt': current_prompt,
+                        'response': message['content'],
+                    }
+                    paired_data.append(paired_row)
+                    current_prompt = None  # Reset after pairing
+
+        unwrapped_turns_df = pd.DataFrame(paired_data)
+        unwrapped_turns_df.rename(columns={"turn": "conversation_turns"}, inplace=True) # The naming in the original dataset is ambiguous
+        self.unwrapped_turns_df = unwrapped_turns_df
+        return unwrapped_turns_df
 
     def extract_prompts(self, filter_language=None, max_char_length=500):
         """
@@ -105,3 +151,29 @@ class LMSYSChat1MHandler:
         language_counts = df['language'].value_counts()
         print("Language Record Counts:")
         print(language_counts.to_frame('Count').reset_index().rename(columns={'index': 'Language'}))
+
+
+class Conversation:
+    def __init__(self, conversation_data):
+        """
+        Initializes the Conversation object with the conversation data.
+
+        Parameters:
+        - conversation_data (list): A list of dictionaries representing a conversation.
+        """
+        self.conversation_data = conversation_data
+
+    def add_turns(self):
+        """
+        Adds a 'turn' key to each dictionary in the conversation,
+        identifying the turn (pair of user and assistant messages).
+
+        Returns:
+        - list: The updated conversation with 'turn' keys added.
+        """
+        turn_counter = 0
+        for message in self.conversation_data:
+            if message['role'] == 'user':
+                turn_counter += 1
+            message['turn'] = turn_counter
+        return self.conversation_data
