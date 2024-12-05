@@ -30,29 +30,43 @@ class LMSYSChat1MHandler:
                 i = int((len(filename) - 41) / 2)
                 print(f"Filename: {filename[:i]}*{filename[-41:]}\nSize: {file_size} bytes")
 
-    def extract_df_sample(self, n_samples):
-        if not self.streaming:    
-            df_sample = self.lmsys_dataset['train'].to_pandas().sample(n_samples)
-            print(f"Retrieved {len(df_sample)} conversations from lmsys/lmsys-chat-1m")
-            if self.verbose and n_samples>4:
-                display(df_sample.head(2))
-                print('...')
-                display(df_sample.tail(2))
-            self.df_sample = df_sample
+    def extract_df_sample(self, n_samples=None, conversation_ids=None):
+        """
+        Extracts a sample of conversations or specific conversations based on their conversation IDs.
 
-        if self.streaming:
-            # Take a sample from the streamed dataset
-            streamed_samples = []
-            for i, row in enumerate(self.lmsys_dataset['train']):
-                streamed_samples.append(row)
-                if i + 1 == n_samples:  # Collect only the desired number of samples
-                    break
+        Parameters:
+        - n_samples (int): Number of random samples to extract. Ignored if `conversation_ids` is provided.
+        - conversation_ids (list): List of conversation IDs to extract. If provided, this takes precedence over `n_samples`.
 
-            # Shuffle and convert the collected samples to a Pandas DataFrame
-            random.shuffle(streamed_samples)
-            df_sample = pd.DataFrame(streamed_samples)
-            self.df_sample = df_sample
-
+        Returns:
+        - pd.DataFrame: A DataFrame containing the extracted conversations.
+        """
+        if conversation_ids:
+            # Filter conversations based on the provided conversation IDs
+            df_sample = self.lmsys_dataset['train'].to_pandas()
+            df_sample = df_sample[df_sample['conversation_id'].isin(conversation_ids)]
+            print(f"Retrieved {len(df_sample)} conversations based on specified IDs")
+        else:
+            # Randomly sample conversations if no IDs are provided
+            if not self.streaming:    
+                df_sample = self.lmsys_dataset['train'].to_pandas().sample(n_samples)
+                print(f"Retrieved {len(df_sample)} random conversations from lmsys/lmsys-chat-1m")
+            else:
+                # Take a sample from the streamed dataset
+                streamed_samples = []
+                for i, row in enumerate(self.lmsys_dataset['train']):
+                    streamed_samples.append(row)
+                    if i + 1 == n_samples:  # Collect only the desired number of samples
+                        break
+                # Shuffle and convert the collected samples to a Pandas DataFrame
+                random.shuffle(streamed_samples)
+                df_sample = pd.DataFrame(streamed_samples)
+                
+        self.df_sample = df_sample
+        if self.verbose and len(df_sample) > 4:
+            display(df_sample.head(2))
+            print('...')
+            display(df_sample.tail(2))
         return df_sample
     
     def add_turns_to_conversations(self):
@@ -146,6 +160,27 @@ class LMSYSChat1MHandler:
             wrapped_message = textwrap.fill(prompt_sample, width=120)
             print(wrapped_message)
         return prompt_sample
+    
+    def search_conversations(self, search_term):
+        """
+        Searches the dataset for a given string and returns a DataFrame with matching records.
+
+        Parameters:
+        - search_term (str): The string to search for in the dataset.
+
+        Returns:
+        - pd.DataFrame: A DataFrame containing conversations where the search term is found.
+        """
+        if self.streaming:
+            raise ValueError("Search is not supported in streaming mode.")
+        df = self.lmsys_dataset['train'].to_pandas()
+        # Filter rows where the search term appears in the 'conversation' column
+        matching_records = df[df['conversation'].apply(
+            lambda conv: any(search_term.lower() in message['content'].lower() for message in conv)
+        )]
+        if self.verbose:
+            print(f"Found {len(matching_records)} matching conversations for search term: '{search_term}'")
+        return matching_records
         
     def print_language_counts(self, df):
         language_counts = df['language'].value_counts()
@@ -177,3 +212,28 @@ class Conversation:
                 turn_counter += 1
             message['turn'] = turn_counter
         return self.conversation_data
+    
+    def pretty_print(self, user_prefix, assistant_prefix, width=80):
+        """
+        Prints the conversation with specified prefixes and wrapped text.
+
+        Parameters:
+        - user_prefix (str): Prefix to prepend to user messages.
+        - assistant_prefix (str): Prefix to prepend to assistant messages.
+        - width (int): Maximum characters per line for wrapping.
+        """
+        wrapper = textwrap.TextWrapper(width=width)
+        
+        for message in self.conversation_data:
+            if message['role'] == 'user':
+                prefix = user_prefix
+            elif message['role'] == 'assistant':
+                prefix = assistant_prefix
+            else:
+                continue  # Ignore roles other than 'user' and 'assistant'
+            
+            # Split on existing newlines, wrap each line, and join back with newlines
+            wrapped_content = "\n".join(
+                wrapper.fill(line) for line in message['content'].splitlines()
+            )
+            print(f"{prefix} {wrapped_content}\n")
