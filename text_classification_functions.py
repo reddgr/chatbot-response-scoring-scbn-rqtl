@@ -90,7 +90,11 @@ class Classifier:
 
         # Calculate metrics
         accuracy = accuracy_score(true_labels, np.argmax(predicted_probs, axis=1))
-        f1 = f1_score(true_labels, np.argmax(predicted_probs, axis=1), average='weighted')
+        if len(self.label_map):
+            average='binary'
+        else:
+            average='weighted'
+        f1 = f1_score(true_labels, np.argmax(predicted_probs, axis=1), average=average)
         cross_entropy_loss = log_loss(true_labels, predicted_probs)
 
         # Print metrics
@@ -137,7 +141,7 @@ class Classifier:
 
         # Calculate metrics
         accuracy = accuracy_score(true_labels, np.argmax(predicted_probs, axis=1))
-        f1 = f1_score(true_labels, np.argmax(predicted_probs, axis=1), average='weighted')
+        f1 = f1_score(true_labels, np.argmax(predicted_probs, axis=1), average='binary')
         cross_entropy_loss = log_loss(true_labels, predicted_probs)
 
         # Print metrics
