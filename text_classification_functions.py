@@ -53,7 +53,7 @@ class Classifier:
         Tests model predictions on a given dataframe column and computes evaluation metrics.
 
         Args:
-            df (pd.DataFrame): Input dataframe containing the data.
+            df (pd.DataFrame): Input dataframe containing a 'label' column.
             target_column (str): The name of the column to classify.
 
         Requirements:
