@@ -117,56 +117,9 @@ class Classifier:
             "confusion_matrix": cm,
             "predicted_probs": predicted_probs  # Include reconstructed probabilities
         }
-    
 
-    def test_model_predictions_SEQ(self, df, target_column):
-        tqdm.pandas()
-        df[f'trimmed_{target_column}'] = df[target_column].progress_apply(self.tokenize_and_trim)
 
-        results = []
-        for text in tqdm(df[f'trimmed_{target_column}'].tolist(), desc="Classifying"):
-            result = self.classifier(text)
-            results.append(result[0])
 
-        # Reconstruct probabilities for binary classification
-        predicted_probs = []
-        for result in results:
-            if result['label'] == 'LABEL_0':
-                predicted_probs.append([result['score'], 1 - result['score']])
-            else:
-                predicted_probs.append([1 - result['score'], result['score']])
-
-        predicted_probs = np.array(predicted_probs)
-        true_labels = df['label']
-
-        # Calculate metrics
-        accuracy = accuracy_score(true_labels, np.argmax(predicted_probs, axis=1))
-        f1 = f1_score(true_labels, np.argmax(predicted_probs, axis=1), average='binary')
-        cross_entropy_loss = log_loss(true_labels, predicted_probs)
-
-        # Print metrics
-        print(f"Accuracy: {accuracy:.4f}")
-        print(f"F1 Score: {f1:.4f}")
-        print(f"Cross Entropy Loss: {cross_entropy_loss:.4f}")
-
-        # Confusion matrix
-        cm = confusion_matrix(true_labels, np.argmax(predicted_probs, axis=1))
-        cmap = plt.cm.Blues
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[0, 1])
-        disp.plot(cmap=cmap)
-        plt.show()
-
-        # Cleanup
-        df.drop(columns=[f'trimmed_{target_column}'], inplace=True)
-
-        # Return metrics and probabilities for further inspection
-        return {
-            "accuracy": accuracy,
-            "f1_score": f1,
-            "cross_entropy_loss": cross_entropy_loss,
-            "confusion_matrix": cm,
-            "predicted_probs": predicted_probs  # Include reconstructed probabilities
-        }
     
 class LanguageDetector:
     def __init__(self, dataframe):
