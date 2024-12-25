@@ -69,6 +69,29 @@ class LMSYSChat1MHandler:
             display(df_sample.tail(2))
         return df_sample
     
+    def parquet_sampling(self, n_samples):
+        base_url = "https://huggingface.co/datasets/lmsys/lmsys-chat-1m/resolve/main/data/"
+        data_files = [
+            "train-00000-of-00006-4feeb3f83346a0e9.parquet",
+            "train-00001-of-00006-4030672591c2f478.parquet",
+            "train-00002-of-00006-1779b7cec9462180.parquet",
+            "train-00003-of-00006-2fa862bfed56af1f.parquet",
+            "train-00004-of-00006-18f4bdd50c103e71.parquet",
+            "train-00005-of-00006-fe1acc5d10a9f0e2.parquet"
+        ]
+        sample_file = random.choice(data_files)
+        print(f"Sampling from {sample_file}")
+        data_files = {"train": base_url + sample_file}
+        parquet_sample = load_dataset("parquet", data_files=data_files, split="train")
+        df_sample = parquet_sample.to_pandas().sample(n_samples)
+        print(f"Retrieved {len(df_sample)} random conversations from lmsys/lmsys-chat-1m/{sample_file}")
+        self.df_sample = df_sample
+        if self.verbose and len(df_sample) > 4:
+            display(df_sample.head(2))
+            print('...')
+            display(df_sample.tail(2))
+        return df_sample
+
     def add_turns_to_conversations(self):
         """
         Adds 'turn' keys to each conversation in the 'conversation' column of the dataframe.
