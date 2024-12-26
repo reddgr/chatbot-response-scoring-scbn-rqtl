@@ -31,7 +31,15 @@ class Classifier:
         max_length = self.classifier.tokenizer.model_max_length
         inputs = self.classifier.tokenizer(text, truncation=True, max_length=max_length, return_tensors="tf")
         return self.classifier.tokenizer.decode(inputs['input_ids'][0], skip_special_tokens=True)
-
+    
+    def classify_single_text(self, text):
+        trimmed_text = self.tokenize_and_trim(text)
+        result = self.classifier(trimmed_text)[0]
+        numeric_label = int(result['label'].split('_')[-1])
+        label = self.label_map[numeric_label]
+        score = result['score']
+        printed_result = f" {score*100:.1f}% {label}"
+        return printed_result
 
     def classify_dataframe_column(self, df, target_column, feature_suffix):
 
