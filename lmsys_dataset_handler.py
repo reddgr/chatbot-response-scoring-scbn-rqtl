@@ -137,7 +137,7 @@ class LMSYSChat1MHandler:
         self.unwrapped_turns_df = unwrapped_turns_df
         return unwrapped_turns_df
 
-    def extract_prompts(self, filter_language=None, max_char_length=500):
+    def extract_prompts(self, filter_language=None, min_char_length=20, max_char_length=500):
         """
         Extracts user prompts from the sample dataframe, optionally filtering by language and limiting the character length.
 
@@ -145,6 +145,7 @@ class LMSYSChat1MHandler:
         - filter_language (list of str or None): A list of specific languages to filter prompts by. If None, no language 
           filter is applied. Examples of valid values include ['English'], ['English', 'Portuguese'], or 
           ['Spanish', 'French', 'German'].
+        - min_char_length (int): The minimum character length for user prompts to include. Defaults to 20.
         - max_char_length (int): The maximum character length for user prompts to include. Defaults to 500.
 
         Returns:
@@ -156,7 +157,7 @@ class LMSYSChat1MHandler:
                 lambda row: [
                     {'content': entry['content'], 'language': row['language']}
                     for entry in row['conversation']
-                    if entry['role'] == 'user' and len(entry['content']) <= max_char_length
+                    if entry['role'] == 'user' and min_char_length <= len(entry['content']) <= max_char_length
                 ], axis=1
             ).explode().dropna()
         else:
@@ -164,7 +165,7 @@ class LMSYSChat1MHandler:
                 lambda row: [
                     {'content': entry['content'], 'language': row['language']}
                     for entry in row['conversation']
-                    if entry['role'] == 'user' and len(entry['content']) <= max_char_length
+                    if entry['role'] == 'user' and min_char_length <= len(entry['content']) <= max_char_length
                 ], axis=1
             ).explode().dropna()
 
